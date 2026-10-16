@@ -1,0 +1,735 @@
+/* ==========================================================================
+   SMART GARDEN IoT - DASHBOARD SPECIFIC STYLES (dashboard.css)
+   Sesuai Konsep Desain & Fitur ujicoba.md
+   ========================================================================== */
+
+/* Grid Tata Letak Dashboard */
+.dashboard-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+/* --------------------------------------------------------------------------
+   1. REALTIME SENSOR METRICS CARDS (Bagian 2 & 3 ujicoba.md)
+   -------------------------------------------------------------------------- */
+.sensor-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+.metric-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 190px;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  padding: 1.4rem;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal), border-color var(--transition-normal);
+}
+
+.metric-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: var(--border-color);
+  transition: background-color var(--transition-normal);
+}
+
+/* Variasi Warna Card */
+.metric-card.soil::before {
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+}
+.metric-card.soil:hover {
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.metric-card.temp::before {
+  background: linear-gradient(90deg, #f97316 0%, #ea580c 100%);
+}
+.metric-card.temp:hover {
+  border-color: rgba(249, 115, 22, 0.4);
+}
+
+.metric-card.humidity::before {
+  background: linear-gradient(90deg, #0ea5e9 0%, #0284c7 100%);
+}
+.metric-card.humidity:hover {
+  border-color: rgba(14, 165, 233, 0.4);
+}
+
+.metric-card.schedule::before {
+  background: linear-gradient(90deg, #8b5cf6 0%, #6366f1 100%);
+}
+.metric-card.schedule:hover {
+  border-color: rgba(139, 92, 246, 0.4);
+}
+
+/* Card Header */
+.metric-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.metric-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.metric-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.metric-card.soil .metric-icon-wrap {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary-dark);
+}
+
+.metric-card.temp .metric-icon-wrap {
+  background-color: var(--color-temp-light);
+  color: var(--color-temp);
+}
+
+.metric-card.humidity .metric-icon-wrap {
+  background-color: var(--color-water-light);
+  color: var(--color-water);
+}
+
+.metric-card.schedule .metric-icon-wrap {
+  background-color: rgba(139, 92, 246, 0.15);
+  color: #7c3aed;
+}
+
+/* Metric Value Main Number */
+.metric-value-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  margin: 0.25rem 0 0.5rem 0;
+}
+
+.metric-number {
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+}
+
+.metric-unit {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* Metric Footer / Status Badge */
+.metric-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.65rem;
+  border-top: 1px dashed var(--border-color);
+  font-size: 0.775rem;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Status Tanah Sesuai Panduan */
+.status-badge.dry {
+  background-color: var(--color-danger-light);
+  color: #dc2626;
+  border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.status-badge.optimal {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.status-badge.wet {
+  background-color: var(--color-water-light);
+  color: #0369a1;
+  border: 1px solid rgba(14, 165, 233, 0.3);
+}
+
+.status-badge.neutral {
+  background-color: var(--bg-surface-subtle);
+  color: var(--text-secondary);
+}
+
+/* Progress Bar Horizontal pada Metric Card */
+.metric-progress-bg {
+  width: 100%;
+  height: 6px;
+  background-color: var(--bg-surface-subtle);
+  border-radius: var(--radius-full);
+  margin-top: 0.5rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.metric-progress-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.metric-card.soil .metric-progress-fill {
+  background: linear-gradient(90deg, #ef4444 0%, #10b981 40%, #0ea5e9 100%);
+}
+
+.metric-card.temp .metric-progress-fill {
+  background: linear-gradient(90deg, #38bdf8 0%, #f97316 60%, #ef4444 100%);
+}
+
+.metric-card.humidity .metric-progress-fill {
+  background: linear-gradient(90deg, #38bdf8 0%, #0284c7 100%);
+}
+
+/* --------------------------------------------------------------------------
+   2. PUMP CONTROL & OPERATION SECTION (Bagian 2 & 5 ujicoba.md)
+   -------------------------------------------------------------------------- */
+.dashboard-main-row {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 1.5rem;
+}
+
+.pump-panel-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Banner Status Pompa */
+.pump-status-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-surface-subtle);
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.pump-status-banner.pump-active {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(14, 165, 233, 0.12) 100%);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 16px var(--color-primary-glow);
+}
+
+.pump-status-banner.pump-inactive {
+  background-color: var(--bg-surface-subtle);
+  border-color: var(--border-color);
+}
+
+.pump-info-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pump-visual-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  font-size: 1.6rem;
+  position: relative;
+}
+
+.pump-active .pump-visual-avatar {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  border-color: transparent;
+  animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+  70% { box-shadow: 0 0 0 12px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.pump-title-group h3 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.pump-active .pump-title-group h3 {
+  color: var(--color-primary-dark);
+}
+[data-theme="dark"] .pump-active .pump-title-group h3 {
+  color: var(--color-primary);
+}
+
+.pump-reason-text {
+  font-size: 0.825rem;
+  color: var(--text-secondary);
+  margin-top: 0.2rem;
+}
+
+/* Water Flow Animation (Saat Pompa ON) */
+.water-flow-indicator {
+  display: none;
+  align-items: center;
+  gap: 4px;
+}
+
+.pump-active .water-flow-indicator {
+  display: flex;
+}
+
+.water-drop {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--color-water);
+  animation: drop-bounce 0.8s infinite ease-in-out;
+}
+.water-drop:nth-child(2) { animation-delay: 0.2s; }
+.water-drop:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes drop-bounce {
+  0%, 100% { transform: translateY(0); opacity: 0.3; }
+  50% { transform: translateY(-8px); opacity: 1; }
+}
+
+/* Mode Operasi Segmented Control */
+.mode-toggle-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+  background-color: var(--bg-surface-subtle);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.mode-label-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.mode-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.mode-subtext {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.segmented-control {
+  display: inline-flex;
+  padding: 3px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+
+.segmented-btn {
+  padding: 0.4rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.segmented-btn.active {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Tombol Aksi Kontrol Pompa Manual */
+.pump-actions-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+.btn-pump-on {
+  background-color: var(--color-primary);
+  color: #ffffff;
+  padding: 0.85rem;
+  font-size: 0.95rem;
+  border-radius: var(--radius-md);
+}
+
+.btn-pump-on:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  box-shadow: 0 4px 12px var(--color-primary-glow);
+}
+
+.btn-pump-off {
+  background-color: #ef4444;
+  color: #ffffff;
+  padding: 0.85rem;
+  font-size: 0.95rem;
+  border-radius: var(--radius-md);
+}
+
+.btn-pump-off:hover:not(:disabled) {
+  background-color: #dc2626;
+  box-shadow: 0 4px 12px var(--color-danger-glow);
+}
+
+/* Histeresis Diagram Explainer */
+.hysteresis-box {
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-surface-subtle);
+  border: 1px solid var(--border-color);
+  font-size: 0.775rem;
+}
+
+.hysteresis-bar {
+  display: flex;
+  height: 10px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin: 0.5rem 0 0.4rem 0;
+}
+
+.hys-zone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.hys-zone.dry {
+  width: 30%;
+  background-color: #ef4444; /* <30% ON */
+}
+
+.hys-zone.stable {
+  width: 30%;
+  background-color: #eab308; /* 30-60% Hold */
+}
+
+.hys-zone.target {
+  width: 40%;
+  background-color: #10b981; /* >=60% OFF */
+}
+
+.hys-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   3. JADWAL PENYIRAMAN (Bagian 2 & Aturan ujicoba.md)
+   -------------------------------------------------------------------------- */
+.schedule-panel-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.schedule-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.95rem 1.15rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-surface-subtle);
+  transition: all var(--transition-normal);
+}
+
+.schedule-item:hover {
+  border-color: rgba(16, 185, 129, 0.3);
+  background-color: var(--bg-surface);
+}
+
+.schedule-item.next-up {
+  border-color: var(--color-primary);
+  background-color: rgba(16, 185, 129, 0.05);
+}
+
+.schedule-time-block {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.schedule-icon-pill {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+}
+
+.schedule-time {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.schedule-name {
+  font-size: 0.775rem;
+  color: var(--text-muted);
+}
+
+.schedule-status-wrap {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+}
+
+/* --------------------------------------------------------------------------
+   4. SENSOR CHARTS SECTION (Chart.js)
+   -------------------------------------------------------------------------- */
+.chart-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.chart-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.chart-pills-group {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background-color: var(--bg-surface-subtle);
+  padding: 3px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.chart-pill {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.chart-pill.active {
+  background-color: var(--bg-surface);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.chart-canvas-wrapper {
+  position: relative;
+  height: 320px;
+  width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   5. LOG RIWAYAT & AKTIVITAS SISTEM
+   -------------------------------------------------------------------------- */
+.logs-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.logs-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.logs-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.log-filter-btn {
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-surface);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.log-filter-btn.active {
+  background-color: var(--color-primary-light);
+  border-color: var(--color-primary);
+  color: var(--color-primary-dark);
+  font-weight: 600;
+}
+
+.logs-table-container {
+  max-height: 280px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+}
+
+.logs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  text-align: left;
+}
+
+.logs-table th {
+  position: sticky;
+  top: 0;
+  background-color: var(--bg-surface-subtle);
+  padding: 0.65rem 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
+  z-index: 2;
+}
+
+.logs-table td {
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-main);
+}
+
+.logs-table tr:hover td {
+  background-color: var(--bg-surface-subtle);
+}
+
+/* --------------------------------------------------------------------------
+   6. FLOATING / COLLAPSIBLE IOT SIMULATOR BAR
+   -------------------------------------------------------------------------- */
+.simulator-drawer {
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-md);
+  margin-top: 1rem;
+}
+
+.simulator-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+.simulator-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.simulator-body {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr) auto;
+  gap: 1.25rem;
+  align-items: end;
+  padding-top: 0.5rem;
+}
+
+.sim-slider-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.sim-label-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.sim-slider {
+  width: 100%;
+  height: 6px;
+  border-radius: var(--radius-full);
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.sim-quick-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}

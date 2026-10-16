@@ -1,0 +1,112 @@
+/* ==========================================================================
+   SMART GARDEN IoT - RESPONSIVE STYLES (responsive.css)
+   Sesuai Panduan ujicoba.md
+   Kartu sensor tersusun dalam beberapa kolom pada komputer
+   dan 1-2 kolom pada smartphone.
+   ========================================================================== */
+
+/* Tablet & Layar Sedang (< 1024px) */
+@media (max-width: 1024px) {
+  .sensor-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .dashboard-main-row {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .header-container {
+    padding: 0.75rem 1rem;
+  }
+
+  .simulator-body {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Smartphone & Layar Kecil (< 768px) */
+@media (max-width: 768px) {
+  .header-container {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .nav-menu {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .nav-link {
+    padding: 0.45rem 0.75rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  .sensor-metrics-grid {
+    grid-template-columns: 1fr; /* 1 kolom pada ponsel sempit atau 2 pada ponsel sedang */
+    gap: 0.85rem;
+  }
+
+  @media (min-width: 480px) and (max-width: 768px) {
+    .sensor-metrics-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .metric-card {
+    min-height: 160px;
+    padding: 1.15rem;
+  }
+
+  .metric-number {
+    font-size: 2.1rem;
+  }
+
+  .pump-actions-group {
+    grid-template-columns: 1fr;
+  }
+
+  .simulator-body {
+    grid-template-columns: 1fr;
+  }
+
+  .main-wrapper {
+    padding: 1rem;
+    gap: 1.25rem;
+  }
+
+  .chart-canvas-wrapper {
+    height: 250px;
+  }
+
+  .toast-container {
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+  }
+
+  .toast {
+    max-width: 100%;
+    min-width: unset;
+  }
+}
+
+/* Layar Sangat Kecil (< 380px) */
+@media (max-width: 380px) {
+  .brand-text h1 {
+    font-size: 1.05rem;
+  }
+
+  .brand-text p {
+    font-size: 0.675rem;
+  }
+
+  .metric-number {
+    font-size: 1.85rem;
+  }
+}

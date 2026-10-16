@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Garden - IoT Plant Monitoring & Irrigation</title>
+  <meta name="description" content="Website pemantauan dan pengendalian penyiraman tanaman cerdas berbasis Internet of Things (IoT), MQTT, dan ESP32.">
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets Sesuai Struktur ujicoba.md -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- =========================================================================
+       APP HEADER / NAVBAR
+       ========================================================================= -->
+  <header class="app-header">
+    <div class="header-container">
+      <!-- Identitas Brand Sesuai Bagian 3 ujicoba.md -->
+      <a href="#dashboard" class="brand" id="brand-link">
+        <div class="brand-icon-wrapper">
+          <img src="assets/images/logo.svg" alt="Smart Garden Logo" width="28" height="28">
+        </div>
+        <div class="brand-text">
+          <h1>Smart Garden</h1>
+          <p>IoT Plant Monitoring &amp; Irrigation</p>
+        </div>
+      </a>
+
+      <!-- Menu Navigasi Utama -->
+      <nav aria-label="Navigasi Utama">
+        <ul class="nav-menu">
+          <li>
+            <a href="#dashboard" class="nav-link active" id="nav-dashboard">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="#monitoring-sensor" class="nav-link" id="nav-sensors">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              </svg>
+              <span>Monitoring Sensor</span>
+            </a>
+          </li>
+          <li>
+            <a href="#kontrol-pompa" class="nav-link" id="nav-pump">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polygon points="10 8 16 12 10 16 10 8"></polygon>
+              </svg>
+              <span>Kontrol Pompa</span>
+            </a>
+          </li>
+          <li>
+            <a href="#jadwal" class="nav-link" id="nav-schedule">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <span>Jadwal</span>
+            </a>
+          </li>
+          <li>
+            <a href="#riwayat" class="nav-link" id="nav-history">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 3v5h5M3.05 13A9 9 0 1 0 6 5.3L3 8"></path>
+              </svg>
+              <span>Riwayat</span>
+            </a>
+          </li>
+          <li>
+            <a href="#panduan" class="nav-link" id="nav-guide">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg>
+              <span>Aturan &amp; Panduan</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Aksi Header: Status Online, Konfigurasi Broker & Tema -->
+      <div class="header-actions">
+        <!-- Status Indikator Perangkat IoT (Sesuai Konsep Bagian 3: "Online") -->
+        <div class="device-status-pill" id="device-status-pill" title="Status koneksi perangkat IoT">
+          <span class="status-dot online"></span>
+          <span>Online</span>
+        </div>
+
+        <!-- Tombol Pengaturan Broker MQTT -->
+        <button class="btn-icon-subtle" id="btn-open-broker-settings" title="Pengaturan Broker MQTT WebSocket">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+
+        <!-- Tombol Toggle Tema (Dark / Light) -->
+        <button class="btn-icon-subtle" id="btn-theme-toggle" title="Ganti Tema Tampilan">
+          <span id="theme-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       MAIN CONTENT WRAPPER
+       ========================================================================= -->
+  <main class="main-wrapper" id="dashboard">
+
+    <!-- Banner Peringatan Gangguan Sistem (Offline / Sensor Drop) -->
+    <div class="system-alert-banner" id="system-alert-banner" role="alert">
+      <div class="alert-content">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span id="system-alert-message">Peringatan: Koneksi perangkat IoT terputus. Sistem mencoba menyambung kembali...</span>
+      </div>
+      <button class="alert-close" onclick="hideSystemBanner()">&times;</button>
+    </div>
+
+    <!-- -----------------------------------------------------------------------
+         BAGIAN 1: KARTU MONITORING REALTIME (Bagian 2 & 3 ujicoba.md)
+         ----------------------------------------------------------------------- -->
+    <section id="monitoring-sensor">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <span class="section-category">MONITORING REALTIME</span>
+          <h2 class="section-title">Kondisi Lingkungan &amp; Tanah</h2>
+          <span class="section-desc" id="last-update-time">Pembaruan: Baru saja</span>
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <span class="status-badge neutral" id="last-sync-badge">Target Ambang: &lt;30% ON | &ge;60% OFF</span>
+        </div>
+      </div>
+
+      <div class="sensor-metrics-grid">
+        <!-- 1. Kelembapan Tanah (Sesuai Konsep Tampilan: 24% | Tanah Kering) -->
+        <div class="metric-card soil" id="card-soil-moisture">
+          <div>
+            <div class="metric-header">
+              <span class="metric-title">Kelembapan Tanah</span>
+              <div class="metric-icon-wrap" title="Soil Moisture Sensor">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+                </svg>
+              </div>
+            </div>
+            <div class="metric-value-wrap">
+              <span class="metric-number" id="val-soil-moisture">24</span>
+              <span class="metric-unit">%</span>
+            </div>
+          </div>
+          <div>
+            <div class="metric-progress-bg">
+              <div class="metric-progress-fill" id="fill-soil-progress" style="width: 24%;"></div>
+            </div>
+            <div class="metric-footer">
+              <span class="status-badge dry" id="badge-soil-status">Tanah kering</span>
+              <span style="color: var(--text-muted); font-size: 0.725rem;">Target: &ge; 60%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Suhu Udara (Sesuai Konsep Tampilan: 29.4°C | Data sensor) -->
+        <div class="metric-card temp" id="card-temperature">
+          <div>
+            <div class="metric-header">
+              <span class="metric-title">Suhu Udara</span>
+              <div class="metric-icon-wrap" title="DHT22 Sensor">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path>
+                </svg>
+              </div>
+            </div>
+            <div class="metric-value-wrap">
+              <span class="metric-number" id="val-temperature">29.4</span>
+              <span class="metric-unit">°C</span>
+            </div>
+          </div>
+          <div>
+            <div class="metric-progress-bg">
+              <div class="metric-progress-fill" id="fill-temp-progress" style="width: 48%;"></div>
+            </div>
+            <div class="metric-footer">
+              <span class="status-badge neutral" id="badge-temp-status">Data sensor</span>
+              <span style="color: var(--text-muted); font-size: 0.725rem;">Sensor DHT22</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Kelembapan Udara (Sesuai Konsep Tampilan: 68% | Data sensor) -->
+        <div class="metric-card humidity" id="card-air-humidity">
+          <div>
+            <div class="metric-header">
+              <span class="metric-title">Kelembapan Udara</span>
+              <div class="metric-icon-wrap" title="DHT22 Sensor">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
+                </svg>
+              </div>
+            </div>
+            <div class="metric-value-wrap">
+              <span class="metric-number" id="val-air-humidity">68</span>
+              <span class="metric-unit">%</span>
+            </div>
+          </div>
+          <div>
+            <div class="metric-progress-bg">
+              <div class="metric-progress-fill" id="fill-hum-progress" style="width: 68%;"></div>
+            </div>
+            <div class="metric-footer">
+              <span class="status-badge neutral" id="badge-hum-status">Data sensor</span>
+              <span style="color: var(--text-muted); font-size: 0.725rem;">Optimal: 50–75%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Penyiraman Berikutnya (Sesuai Konsep Tampilan: 17.00 | Jadwal sore) -->
+        <div class="metric-card schedule" id="card-next-schedule">
+          <div>
+            <div class="metric-header">
+              <span class="metric-title">Penyiraman Berikutnya</span>
+              <div class="metric-icon-wrap" title="Jadwal Penyiraman">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+              </div>
+            </div>
+            <div class="metric-value-wrap">
+              <span class="metric-number" id="val-next-schedule-time">17.00</span>
+              <span class="metric-unit">WIB</span>
+            </div>
+          </div>
+          <div>
+            <div class="metric-footer" style="border-top: none; padding-top: 0;">
+              <span style="font-size: 0.825rem; font-weight: 600; color: var(--text-main);" id="lbl-next-schedule-label">Jadwal sore</span>
+            </div>
+            <div class="metric-footer">
+              <span class="status-badge optimal" id="badge-schedule-countdown">Menghitung...</span>
+              <span style="color: var(--text-muted); font-size: 0.725rem;">2x Sehari</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- -----------------------------------------------------------------------
+         BAGIAN 2: KONTROL POMPA AIR & JADWAL PENYIRAMAN (Bagian 2, 3, & 5)
+         ----------------------------------------------------------------------- -->
+    <div class="dashboard-main-row">
+      <!-- PANEL KONTROL POMPA AIR -->
+      <section class="card pump-panel-card" id="kontrol-pompa">
+        <div class="section-header" style="margin-bottom: 0;">
+          <div class="section-title-wrap">
+            <span class="section-category">KONTROL SISTEM</span>
+            <h3 class="section-title">Kontrol Pompa Air</h3>
+          </div>
+          <span style="font-size: 0.75rem; color: var(--text-muted);" id="pump-safety-timer">Proteksi Max: 180 dtk</span>
+        </div>
+
+        <!-- Banner Status Pompa Sesuai Konsep Bagian 3: Pompa ON / Pompa OFF -->
+        <div class="pump-status-banner pump-active" id="pump-status-banner">
+          <div class="pump-info-left">
+            <div class="pump-visual-avatar" id="pump-avatar-icon">
+              <!-- Water Pump Motor Icon -->
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              </svg>
+            </div>
+            <div class="pump-title-group">
+              <h3 id="pump-status-text">Pompa ON</h3>
+              <p class="pump-reason-text" id="pump-reason-text">Pompa menyala karena kelembapan tanah di bawah 30%.</p>
+            </div>
+          </div>
+          <!-- Animasi Tetes Air Saat Aktif -->
+          <div class="water-flow-indicator" aria-label="Aliran Air Aktif">
+            <span class="water-drop"></span>
+            <span class="water-drop"></span>
+            <span class="water-drop"></span>
+          </div>
+        </div>
+
+        <!-- Mode Operasi: Otomatis vs Manual -->
+        <div class="mode-toggle-group">
+          <div class="mode-label-wrap">
+            <span class="mode-label">Mode Operasi</span>
+            <span class="mode-subtext">Pilih logika kendali otomatis atau kendali pengguna</span>
+          </div>
+          <div class="segmented-control" role="group" aria-label="Mode Operasi">
+            <button class="segmented-btn active" id="btn-mode-auto" type="button">Otomatis</button>
+            <button class="segmented-btn" id="btn-mode-manual" type="button">Manual</button>
+          </div>
+        </div>
+
+        <!-- Tombol Aksi Kontrol Manual: Pompa ON & Pompa OFF (Bagian 3 Konsep Desain) -->
+        <div class="pump-actions-group">
+          <button class="btn btn-pump-on" id="btn-pump-on" type="button">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <span>Pompa ON</span>
+          </button>
+          <button class="btn btn-pump-off" id="btn-pump-off" type="button">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="6" y="6" width="12" height="12"></rect>
+            </svg>
+            <span>Pompa OFF</span>
+          </button>
+        </div>
+
+        <!-- Visualisasi Aturan Histeresis Ambang Batas 30% & 60% -->
+        <div class="hysteresis-box">
+          <div style="display: flex; justify-content: space-between; font-weight: 600;">
+            <span>Aturan Ambang Histeresis:</span>
+            <span style="color: var(--color-primary-dark);">Mencegah Pompa Sering Hidup-Mati</span>
+          </div>
+          <div class="hysteresis-bar">
+            <div class="hys-zone dry" title="<30%: Pompa Otomatis ON"></div>
+            <div class="hys-zone stable" title="30% - 59.9%: Histeresis Stabil (Pertahankan Status Sebelumnya)"></div>
+            <div class="hys-zone target" title=">=60%: Pompa Otomatis OFF"></div>
+          </div>
+          <div class="hys-labels">
+            <span>0% (Kering)</span>
+            <span style="font-weight: 700; color: #dc2626;">30% (ON)</span>
+            <span style="font-weight: 700; color: #059669;">60% (OFF)</span>
+            <span>100% (Basah Penuh)</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- PANEL JADWAL PENYIRAMAN -->
+      <section class="card schedule-panel-card" id="jadwal">
+        <div class="section-header" style="margin-bottom: 0;">
+          <div class="section-title-wrap">
+            <span class="section-category">OTOMASI WAKTU</span>
+            <h3 class="section-title">Jadwal Penyiraman</h3>
+          </div>
+          <span class="status-badge neutral">WIB (Asia/Jakarta)</span>
+        </div>
+
+        <p style="font-size: 0.8rem; color: var(--text-muted);">
+          Penyiraman terjadwal 2 kali sehari dijalankan mandiri oleh mikrokontroler ESP32 hingga target 60% atau batas waktu tercapai.
+        </p>
+
+        <div class="schedule-list">
+          <!-- Jadwal Pagi: 07.00 WIB -->
+          <div class="schedule-item next-up" id="schedule-item-morning">
+            <div class="schedule-time-block">
+              <div class="schedule-icon-pill" style="color: #f59e0b;">
+                <!-- Sun Icon -->
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="5"></circle>
+                  <line x1="12" y1="1" x2="12" y2="3"></line>
+                  <line x1="12" y1="21" x2="12" y2="23"></line>
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                  <line x1="1" y1="12" x2="3" y2="12"></line>
+                  <line x1="21" y1="12" x2="23" y2="12"></line>
+                </svg>
+              </div>
+              <div>
+                <div class="schedule-time">07.00 WIB</div>
+                <div class="schedule-name">Penyiraman Pagi (Sebelum Terik)</div>
+              </div>
+            </div>
+            <div class="schedule-status-wrap">
+              <span class="status-badge optimal" id="badge-morning-status">Menunggu Jadwal</span>
+              <span style="font-size: 0.7rem; color: var(--text-muted);">Target: &ge; 60%</span>
+            </div>
+          </div>
+
+          <!-- Jadwal Sore: 17.00 WIB -->
+          <div class="schedule-item" id="schedule-item-evening">
+            <div class="schedule-time-block">
+              <div class="schedule-icon-pill" style="color: #8b5cf6;">
+                <!-- Sunset / Moon Icon -->
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 10V2M4.93 10.93l1.41 1.41M2 18h2M20 18h2M19.07 10.93l-1.41 1.41M22 22H2M16 6l-4 4-4-4"></path>
+                </svg>
+              </div>
+              <div>
+                <div class="schedule-time">17.00 WIB</div>
+                <div class="schedule-name">Penyiraman Sore (Kebutuhan Malam)</div>
+              </div>
+            </div>
+            <div class="schedule-status-wrap">
+              <span class="status-badge dry" id="badge-evening-status">Menunggu Jadwal</span>
+              <span style="font-size: 0.7rem; color: var(--text-muted);">Target: &ge; 60%</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="background-color: var(--bg-surface-subtle); padding: 0.75rem 1rem; border-radius: var(--radius-md); font-size: 0.75rem; color: var(--text-secondary); border: 1px solid var(--border-color);">
+          <strong>Catatan Keandalan:</strong> Logika jadwal dijalankan di ESP32 menggunakan protokol NTP, sehingga penyiraman tetap berlangsung tepat waktu meskipun browser ditutup.
+        </div>
+      </section>
+    </div>
+
+    <!-- -----------------------------------------------------------------------
+         BAGIAN 3: GRAFIK & ANALITIK RIWAYAT SENSOR (Bagian 2 & 4 ujicoba.md)
+         ----------------------------------------------------------------------- -->
+    <section class="card chart-card" id="grafik-sensor">
+      <div class="chart-controls">
+        <div class="section-title-wrap">
+          <span class="section-category">ANALITIK WAKTU</span>
+          <h3 class="section-title">Grafik Perubahan Sensor</h3>
+          <span class="section-desc">Evaluasi tren kelembapan tanah, suhu, dan kelembapan udara</span>
+        </div>
+
+        <!-- Filter Tampilan Metrik -->
+        <div class="chart-pills-group" role="group" aria-label="Filter Metrik">
+          <button class="chart-pill active" data-metric="all">Semua Metrik</button>
+          <button class="chart-pill" data-metric="soil">Kelembapan Tanah</button>
+          <button class="chart-pill" data-metric="temp">Suhu Udara</button>
+          <button class="chart-pill" data-metric="humidity">Kelembapan Udara</button>
+        </div>
+      </div>
+
+      <div class="chart-canvas-wrapper">
+        <canvas id="sensorHistoryChart"></canvas>
+      </div>
+    </section>
+
+    <!-- -----------------------------------------------------------------------
+         BAGIAN 4: LOG RIWAYAT AKTIVITAS SISTEM (Bagian 2 ujicoba.md)
+         ----------------------------------------------------------------------- -->
+    <section class="card logs-card" id="riwayat">
+      <div class="logs-toolbar">
+        <div class="section-title-wrap">
+          <span class="section-category">LOG EVENT</span>
+          <h3 class="section-title">Riwayat Aktivitas &amp; Pengendalian</h3>
+        </div>
+
+        <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+          <div class="logs-filter-group">
+            <button class="log-filter-btn active" data-category="all">Semua</button>
+            <button class="log-filter-btn" data-category="Sensor">Sensor</button>
+            <button class="log-filter-btn" data-category="Pompa">Pompa</button>
+            <button class="log-filter-btn" data-category="Jadwal">Jadwal</button>
+            <button class="log-filter-btn" data-category="Sistem">Sistem</button>
+          </div>
+
+          <button class="btn btn-secondary btn-sm" id="btn-export-logs" title="Ekspor data ke file CSV">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Ekspor CSV</span>
+          </button>
+          <button class="btn btn-secondary btn-sm" id="btn-clear-logs" title="Bersihkan riwayat log">Bersihkan</button>
+        </div>
+      </div>
+
+      <div class="logs-table-container">
+        <table class="logs-table">
+          <thead>
+            <tr>
+              <th style="width: 110px;">Waktu (WIB)</th>
+              <th style="width: 100px;">Kategori</th>
+              <th>Keterangan Aktivitas</th>
+            </tr>
+          </thead>
+          <tbody id="logs-table-body">
+            <!-- Diisi secara dinamis oleh js/app.js -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- -----------------------------------------------------------------------
+         BAGIAN 5: SIMULATOR IOT & PENGUJIAN SKENARIO (Interaktif & Fungsional)
+         ----------------------------------------------------------------------- -->
+    <section class="simulator-drawer" id="simulator-panel">
+      <div class="simulator-header">
+        <div class="simulator-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+          <span>Simulator Perangkat IoT ESP32 &amp; Uji Cepat Skenario</span>
+        </div>
+        <span class="status-badge optimal" style="font-size: 0.725rem;">Simulator Siap Uji</span>
+      </div>
+
+      <p style="font-size: 0.775rem; color: var(--text-muted); margin-bottom: 0.85rem;">
+        Gunakan simulator ini untuk menguji secara instan seluruh kriteria keberhasilan Smart Garden IoT (ambang batas 30%, histeresis 30–60%, target 60%, jadwal, dan putus koneksi) tanpa harus menyalakan mikrokontroler fisik.
+      </p>
+
+      <div class="simulator-body">
+        <!-- Slider Tanah -->
+        <div class="sim-slider-group">
+          <div class="sim-label-row">
+            <span>Kelembapan Tanah:</span>
+            <span id="sim-soil-val" style="color: var(--color-primary-dark); font-weight: 700;">24%</span>
+          </div>
+          <input type="range" class="sim-slider" id="sim-soil" min="10" max="100" value="24" step="1">
+        </div>
+
+        <!-- Slider Suhu -->
+        <div class="sim-slider-group">
+          <div class="sim-label-row">
+            <span>Suhu Udara:</span>
+            <span id="sim-temp-val" style="color: var(--color-temp); font-weight: 700;">29.4°C</span>
+          </div>
+          <input type="range" class="sim-slider" id="sim-temp" min="15" max="45" value="29.4" step="0.5">
+        </div>
+
+        <!-- Slider Kelembapan Udara -->
+        <div class="sim-slider-group">
+          <div class="sim-label-row">
+            <span>Kelembapan Udara:</span>
+            <span id="sim-hum-val" style="color: var(--color-water); font-weight: 700;">68%</span>
+          </div>
+          <input type="range" class="sim-slider" id="sim-hum" min="20" max="95" value="68" step="1">
+        </div>
+
+        <!-- Tombol Aksi Cepat Skenario Pengujian (Sesuai Kriteria Bagian 7 ujicoba.md) -->
+        <div class="sim-quick-buttons">
+          <button class="btn btn-secondary btn-sm" id="btn-sim-dry" title="Set tanah ke 24% untuk memicu pompa otomatis ON">Uji Kering (&lt;30%)</button>
+          <button class="btn btn-secondary btn-sm" id="btn-sim-wet" title="Set tanah ke 65% untuk memicu pompa otomatis OFF">Uji Target (&ge;60%)</button>
+          <button class="btn btn-secondary btn-sm" id="btn-sim-hysteresis" title="Set tanah ke 45% untuk menguji histeresis tetap stabil">Uji Histeresis (45%)</button>
+          <button class="btn btn-secondary btn-sm" id="btn-sim-morning" title="Simulasikan jadwal penyiraman 07.00 pagi">Uji Jadwal 07.00</button>
+          <button class="btn btn-secondary btn-sm" id="btn-sim-disconnect" style="color: #ef4444;" title="Simulasikan koneksi broker/perangkat terputus">Putus Jaringan</button>
+          <button class="btn btn-secondary btn-sm" id="btn-sim-reconnect" style="color: #10b981;" title="Sambungkan kembali ke broker">Sambung Kembali</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- -----------------------------------------------------------------------
+         BAGIAN 6: DOKUMENTASI LENGKAP & SPESIFIKASI ARSITEKTUR SISTEM
+         (Mempertahankan seluruh teks & aturan dari ujicoba.md tanpa hilang)
+         ----------------------------------------------------------------------- -->
+    <section class="card" id="panduan" style="margin-top: 1rem;">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <span class="section-category">REFERENSI TEKNIS LENGKAP</span>
+          <h3 class="section-title">Dokumentasi &amp; Aturan Sistem Smart Garden IoT</h3>
+          <span class="section-desc">Seluruh isi rancangan, spesifikasi, dan 12 kriteria keberhasilan dari file ujicoba.md</span>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 1.5rem; font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6;">
+        <!-- Tujuan Website -->
+        <div>
+          <h4 style="color: var(--text-main); font-size: 1.05rem; margin-bottom: 0.5rem;">1. Tujuan Website Smart Garden IoT</h4>
+          <p>
+            Tujuan utama website Smart Garden IoT adalah membangun sistem penyiraman tanaman yang cerdas, otomatis, efisien, dan dapat dikendalikan dari jarak jauh melalui browser pada komputer atau smartphone.
+          </p>
+          <ol style="margin-left: 1.5rem; margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.3rem;">
+            <li>Memantau kelembapan tanah secara realtime untuk mengetahui kondisi tanah dan kebutuhan air tanaman.</li>
+            <li>Memantau suhu dan kelembapan udara sebagai informasi kondisi lingkungan tanaman.</li>
+            <li>Mengaktifkan pompa air secara otomatis ketika kelembapan tanah kurang dari 30% dan menghentikannya ketika kelembapan tanah mencapai atau melebihi 60%.</li>
+            <li>Menjadwalkan penyiraman otomatis dua kali sehari, yaitu pukul 07.00 dan 17.00.</li>
+            <li>Menyediakan kontrol manual agar pengguna dapat menyalakan atau mematikan pompa melalui website.</li>
+            <li>Menampilkan status pompa, mode operasi, jadwal penyiraman, dan riwayat perubahan sensor.</li>
+            <li>Menghemat penggunaan air dan mengurangi kebutuhan penyiraman secara manual.</li>
+          </ol>
+        </div>
+
+        <!-- Tabel Aturan Otomasi Pompa & Histeresis -->
+        <div>
+          <h4 style="color: var(--text-main); font-size: 1.05rem; margin-bottom: 0.5rem;">2. Aturan Otomasi Pompa &amp; Histeresis</h4>
+          <table class="logs-table" style="margin-top: 0.5rem;">
+            <thead>
+              <tr>
+                <th>Kondisi Sensor / Jadwal</th>
+                <th>Tindakan Sistem</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Kelembapan tanah kurang dari 30%</strong></td>
+                <td><span class="status-badge dry">Pompa ON</span> (Memulai penyiraman otomatis)</td>
+              </tr>
+              <tr>
+                <td><strong>Kelembapan tanah mencapai atau lebih dari 60%</strong></td>
+                <td><span class="status-badge optimal">Pompa OFF</span> (Menghentikan penyiraman)</td>
+              </tr>
+              <tr>
+                <td><strong>Kelembapan tanah 30%–kurang dari 60%</strong></td>
+                <td><span class="status-badge neutral">Pertahankan status sebelumnya</span> (Zona Histeresis)</td>
+              </tr>
+              <tr>
+                <td><strong>Pukul 07.00 WIB</strong></td>
+                <td>Jalankan penyiraman pagi jika belum dijalankan</td>
+              </tr>
+              <tr>
+                <td><strong>Pukul 17.00 WIB</strong></td>
+                <td>Jalankan penyiraman sore jika belum dijalankan</td>
+              </tr>
+              <tr>
+                <td><strong>Pengguna memilih mode Manual</strong></td>
+                <td>Pompa mengikuti perintah manual ON/OFF, dengan proteksi keselamatan tetap aktif</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="margin-top: 0.6rem; font-size: 0.8rem; color: var(--text-muted);">
+            <em>Catatan penting:</em> Batas 30% dan 60% membentuk histeresis agar pompa tidak sering hidup-mati ketika nilai sensor berada dekat ambang batas. Rekomendasi awal adalah pompa berhenti ketika kelembapan mencapai 60%, disertai batas waktu maksimum 180 detik sebagai proteksi pengaman.
+          </p>
+        </div>
+
+        <!-- Tabel Teknologi -->
+        <div>
+          <h4 style="color: var(--text-main); font-size: 1.05rem; margin-bottom: 0.5rem;">3. Teknologi dan Batasan Teknis</h4>
+          <table class="logs-table" style="margin-top: 0.5rem;">
+            <thead>
+              <tr>
+                <th>Bagian</th>
+                <th>Teknologi</th>
+                <th>Fungsi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Frontend</td>
+                <td>HTML, CSS, JavaScript</td>
+                <td>Struktur, desain, dan interaksi dashboard responsif</td>
+              </tr>
+              <tr>
+                <td>Grafik</td>
+                <td>Chart.js</td>
+                <td>Grafik sensor dari waktu ke waktu</td>
+              </tr>
+              <tr>
+                <td>Mikrokontroler</td>
+                <td>ESP32</td>
+                <td>Membaca sensor dan mengendalikan relay pompa</td>
+              </tr>
+              <tr>
+                <td>Sensor tanah</td>
+                <td>Soil moisture sensor</td>
+                <td>Mengukur kelembapan tanah (ADC kalibrasi)</td>
+              </tr>
+              <tr>
+                <td>Sensor udara</td>
+                <td>DHT22</td>
+                <td>Mengukur suhu (°C) dan kelembapan udara (%)</td>
+              </tr>
+              <tr>
+                <td>Komunikasi</td>
+                <td>MQTT</td>
+                <td>Mengirim data dan perintah kendali secara realtime</td>
+              </tr>
+              <tr>
+                <td>Koneksi web</td>
+                <td>MQTT over WebSocket</td>
+                <td>Menghubungkan dashboard browser dengan broker MQTT</td>
+              </tr>
+              <tr>
+                <td>Broker</td>
+                <td>Mosquitto / EMQX</td>
+                <td>Meneruskan pesan antara ESP32 dan website</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 12 Kriteria Keberhasilan -->
+        <div>
+          <h4 style="color: var(--text-main); font-size: 1.05rem; margin-bottom: 0.5rem;">4. Dua Belas Kriteria Keberhasilan Website</h4>
+          <table class="logs-table" style="margin-top: 0.5rem;">
+            <thead>
+              <tr>
+                <th style="width: 40px;">No.</th>
+                <th style="width: 170px;">Kriteria Pengujian</th>
+                <th>Target Keberhasilan Teruji</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>1</td><td><strong>Monitoring sensor</strong></td><td>Nilai tanah, suhu, dan kelembapan udara tampil sesuai data perangkat</td></tr>
+              <tr><td>2</td><td><strong>Pembaruan realtime</strong></td><td>Data tampil tanpa reload; interval pembaruan &lt; 3 detik</td></tr>
+              <tr><td>3</td><td><strong>Pompa otomatis ON</strong></td><td>Pompa menyala saat kelembapan tanah kurang dari 30%</td></tr>
+              <tr><td>4</td><td><strong>Pompa otomatis OFF</strong></td><td>Pompa mati saat kelembapan tanah mencapai atau melebihi 60%</td></tr>
+              <tr><td>5</td><td><strong>Histeresis</strong></td><td>Status pompa tetap stabil pada rentang 30% hingga kurang dari 60%</td></tr>
+              <tr><td>6</td><td><strong>Jadwal pagi</strong></td><td>Penyiraman dijalankan pada pukul 07.00 sesuai aturan</td></tr>
+              <tr><td>7</td><td><strong>Jadwal sore</strong></td><td>Penyiraman dijalankan pada pukul 17.00 sesuai aturan</td></tr>
+              <tr><td>8</td><td><strong>Kontrol manual</strong></td><td>Perintah ON/OFF diproses dan status aktual dikonfirmasi ESP32</td></tr>
+              <tr><td>9</td><td><strong>Ketahanan koneksi</strong></td><td>Sistem mendeteksi koneksi putus dan mencoba menyambung kembali</td></tr>
+              <tr><td>10</td><td><strong>Keamanan pompa</strong></td><td>Batas waktu operasi maksimum 180 detik dan proteksi sensor gagal</td></tr>
+              <tr><td>11</td><td><strong>Responsivitas</strong></td><td>Dashboard berfungsi sempurna pada komputer dan smartphone</td></tr>
+              <tr><td>12</td><td><strong>Keamanan MQTT</strong></td><td>Broker membatasi akses dan kredensial terpisah dari frontend</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================================================================
+       FOOTER
+       ========================================================================= -->
+  <footer class="app-footer">
+    <div class="footer-content">
+      <div>
+        <strong>Smart Garden IoT</strong> &copy; 2026. Sistem Monitoring &amp; Penyiraman Tanaman Cerdas.
+      </div>
+      <div>
+        <span>Protokol MQTT WebSocket | ESP32 Firmware | Chart.js</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- =========================================================================
+       MODAL PENGATURAN BROKER MQTT
+       ========================================================================= -->
+  <div class="modal-overlay" id="broker-modal">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <h3 style="font-size: 1.15rem; font-weight: 700;">Pengaturan Broker MQTT WebSocket</h3>
+        <button id="btn-close-modal" style="background:none; border:none; font-size: 1.5rem; cursor:pointer; color: var(--text-muted);">&times;</button>
+      </div>
+
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">
+        Masukkan alamat broker MQTT WebSocket Anda (misal Mosquitto lokal di port 9001 atau EMQX Cloud).
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 0.85rem; margin-bottom: 1.5rem;">
+        <div>
+          <label style="font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 0.3rem;">Host / IP Broker</label>
+          <input type="text" id="input-broker-host" value="broker.emqx.io" style="width: 100%; padding: 0.6rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-surface); color: var(--text-main);">
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div>
+            <label style="font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 0.3rem;">Port WebSocket</label>
+            <input type="number" id="input-broker-port" value="8084" style="width: 100%; padding: 0.6rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-surface); color: var(--text-main);">
+          </div>
+          <div>
+            <label style="font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 0.3rem;">Path</label>
+            <input type="text" id="input-broker-path" value="/mqtt" style="width: 100%; padding: 0.6rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-surface); color: var(--text-main);">
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.25rem;">
+          <input type="checkbox" id="input-broker-ssl" checked>
+          <label for="input-broker-ssl" style="font-size: 0.8rem; font-weight: 500;">Gunakan SSL / WSS (Secure WebSocket)</label>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('broker-modal').classList.remove('active')">Batal</button>
+        <button class="btn btn-primary btn-sm" id="btn-save-broker">Simpan &amp; Hubungkan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <!-- External Libraries: Chart.js & Paho MQTT -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+
+  <!-- Local Modules Sesuai Bagian 6 ujicoba.md -->
+  <script src="config/app-config.js"></script>
+  <script src="js/mqtt-client.js"></script>
+  <script src="js/sensor.js"></script>
+  <script src="js/pump-control.js"></script>
+  <script src="js/schedule.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
